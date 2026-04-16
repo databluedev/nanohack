@@ -100,11 +100,20 @@ def assess_route(
             "junction_type": spot.get("junction_type", "unknown"),
         })
 
+    # Traffic congestion factor
+    try:
+        from traffic import get_route_congestion
+        is_wknd = day_type in ("weekend", "holiday", "festival")
+        congestion = get_route_congestion(polyline, departure.hour, is_wknd)
+        traffic_mult = congestion.get("risk_multiplier", 1.0)
+    except Exception:
+        traffic_mult = 1.0
+
     # Background risk per km (structural baseline)
     length_km = polyline_length_km(polyline)
     background = length_km * 0.25 * base_mult  # ~0.25 risk per km in clear weekday midday
 
-    total = spot_risk_sum + background
+    total = (spot_risk_sum + background) * traffic_mult
     # Soft saturation: avoid hard 100 cap so time-slider shows variation
     # logistic-ish: 100 * total / (total + K)
     K = 30.0

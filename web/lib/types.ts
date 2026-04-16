@@ -188,6 +188,32 @@ export type SmartNotification = {
   message: string;
 };
 
+export type TrafficCell = {
+  lat: number;
+  lng: number;
+  congestion: number;
+  level: "free_flow" | "light" | "moderate" | "heavy";
+  color: string;
+  corridor: string | null;
+  speed_factor: number;
+};
+
+export type SafeDestination = {
+  name: string;
+  type: string;
+  category: string;
+  lat: number;
+  lng: number;
+  safe_reasons: string[];
+  distance_m: number;
+  distance_km: number;
+  safety_score: number;
+  level: string;
+  in_safe_zone: string | null;
+  nearest_blackspot: string | null;
+  blackspot_distance_m: number | null;
+};
+
 export type DriverScore = {
   total_trips: number;
   safe_trips: number;

@@ -20,6 +20,8 @@ from emergency import (
     find_nearby_services, find_nearby_services_overpass, simulate_alert
 )
 from weather import fetch_live_weather
+from traffic import get_traffic_overlay, get_route_congestion, get_congestion_for_point
+from destinations import find_safe_destinations_overpass, find_safe_destinations
 
 ROOT = Path(__file__).parent.parent
 WEB_DIR = ROOT / "web"
@@ -83,6 +85,20 @@ class AreaRiskReq(BaseModel):
     lat: float = 13.05
     lng: float = 80.22
     radius_km: float = 8.0
+
+class TrafficReq(BaseModel):
+    lat: float = 13.05
+    lng: float = 80.22
+    hour: int = 18
+    is_weekend: bool = False
+    radius_km: float = 8.0
+
+class SafeDestReq(BaseModel):
+    lat: float
+    lng: float
+    category: Optional[str] = None  # fuel, parking, food, hospital, hotel, or None for all
+    radius_m: float = 5000.0
+    min_safety: int = 50
 
 # ---------- Helpers ----------
 def parse_dt(s: Optional[str]) -> datetime:
@@ -199,7 +215,43 @@ def area_risk(req: AreaRiskReq):
 
     return {"cells": cells, "grid_size": grid_size, "center": {"lat": req.lat, "lng": req.lng}}
 
-# ---- Community Reports ----
+# ---- Traffic Congestion ----
+@app.post("/api/traffic")
+def traffic_overlay(req: TrafficReq):
+    """Real-time traffic congestion grid for map overlay."""
+    cells = get_traffic_overlay(req.lat, req.lng, req.hour, req.is_weekend, req.radius_km)
+    return {"cells": cells, "count": len(cells), "hour": req.hour}
+
+@app.post("/api/traffic/route")
+async def traffic_route(req: RouteReq):
+    """Get congestion impact for a specific route."""
+    routes = await fetch_routes(req.from_lat, req.from_lng, req.to_lat, req.to_lng, 1)
+    if not routes:
+        raise HTTPException(503, "No route found")
+    departure = parse_dt(req.departure)
+    is_wknd = departure.weekday() >= 5
+    cong = get_route_congestion(routes[0]["polyline"], departure.hour, is_wknd)
+    return {**cong, "route_id": routes[0]["id"]}
+
+# ---- Safe Destination Discovery ----
+@app.post("/api/destinations/safe")
+async def safe_destinations(req: SafeDestReq):
+    """Find nearby amenities in low-risk zones."""
+    results = await find_safe_destinations_overpass(
+        req.lat, req.lng, req.category, req.radius_m, req.min_safety
+    )
+    return {"destinations": results, "count": len(results)}
+
+# ---- Community Reports (with decay) ----
+REPORT_EXPIRY_HOURS = {
+    "pothole": 168,         # 7 days
+    "waterlogging": 24,     # 1 day (weather-dependent)
+    "construction": 720,    # 30 days
+    "blind_turn": 2160,     # 90 days (structural)
+    "accident_spot": 72,    # 3 days
+    "other": 48,            # 2 days
+}
+
 def _load_reports() -> List[Dict]:
     if REPORTS_FILE.exists():
         try:
@@ -211,9 +263,35 @@ def _load_reports() -> List[Dict]:
 def _save_reports(reports: List[Dict]):
     REPORTS_FILE.write_text(json.dumps(reports, indent=2))
 
+def _filter_expired(reports: List[Dict]) -> List[Dict]:
+    """Remove expired reports based on type-specific TTL. Upvotes extend lifespan."""
+    now = datetime.now()
+    active = []
+    for r in reports:
+        try:
+            created = datetime.fromisoformat(r["timestamp"])
+        except Exception:
+            continue
+        age_hours = (now - created).total_seconds() / 3600
+        ttl = REPORT_EXPIRY_HOURS.get(r.get("type", "other"), 48)
+        # Each upvote adds 25% more lifespan
+        upvote_bonus = r.get("upvotes", 0) * 0.25
+        effective_ttl = ttl * (1 + upvote_bonus)
+        if age_hours <= effective_ttl:
+            # Add freshness info
+            r["hours_remaining"] = round(effective_ttl - age_hours, 1)
+            r["freshness"] = "fresh" if age_hours < ttl * 0.3 else "aging" if age_hours < ttl * 0.7 else "expiring"
+            active.append(r)
+    return active
+
 @app.get("/api/community/reports")
 def get_reports():
-    return {"reports": _load_reports()}
+    reports = _load_reports()
+    active = _filter_expired(reports)
+    # Persist cleanup
+    if len(active) < len(reports):
+        _save_reports(active)
+    return {"reports": active, "total": len(active), "expired_cleaned": len(reports) - len(active)}
 
 @app.post("/api/community/report")
 def add_report(req: CommunityReportReq):

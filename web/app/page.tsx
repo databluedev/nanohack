@@ -13,10 +13,11 @@ import { CommunityReportPanel } from "@/components/CommunityReport";
 import { CrashDetector } from "@/components/CrashDetector";
 import { RiskExplainer } from "@/components/RiskExplainer";
 import { DriverScoreCard } from "@/components/DriverScoreCard";
-import { sendEmergencyAlert, fetchSafeZones, fetchAreaRisk, fetchCommunityReports, fetchRiskExplanation } from "@/lib/api";
+import { sendEmergencyAlert, fetchSafeZones, fetchAreaRisk, fetchCommunityReports, fetchRiskExplanation, fetchTrafficOverlay } from "@/lib/api";
+import { SafeDestinations } from "@/components/SafeDestinations";
 import { CHENNAI_PRESETS } from "@/lib/presets";
 import { updateDriverScore, loadDriverScore } from "@/lib/driverScore";
-import type { LatLng, Route, EmergencyService, SafeZone, AreaRiskCell, CommunityReport, Weather, RiskExplanation, DriverScore } from "@/lib/types";
+import type { LatLng, Route, EmergencyService, SafeZone, AreaRiskCell, CommunityReport, Weather, RiskExplanation, DriverScore, TrafficCell } from "@/lib/types";
 
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 
@@ -66,12 +67,16 @@ export default function Home() {
   const [showDriverScore, setShowDriverScore] = useState(false);
   const [driverScore, setDriverScore] = useState<DriverScore>(loadDriverScore());
   const [womenSafetyMode, setWomenSafetyMode] = useState(false);
+  const [trafficCells, setTrafficCells] = useState<TrafficCell[]>([]);
+  const [showTraffic, setShowTraffic] = useState(false);
+  const [showSafeDestinations, setShowSafeDestinations] = useState(false);
 
   // Load overlays
   useEffect(() => {
     fetchSafeZones().then((d) => setSafeZones(d.zones)).catch(() => {});
     fetchAreaRisk().then((d) => setAreaRiskCells(d.cells)).catch(() => {});
     fetchCommunityReports().then((d) => setCommunityReports(d.reports)).catch(() => {});
+    fetchTrafficOverlay().then((d) => setTrafficCells(d.cells)).catch(() => {});
   }, []);
 
   const handleRoutes = useCallback((rs: Route[]) => {
@@ -174,6 +179,7 @@ export default function Home() {
           safeZones={showSafeZones ? safeZones : undefined}
           areaRiskCells={showAreaRisk ? areaRiskCells : undefined}
           communityReports={showReports ? communityReports : undefined}
+          trafficCells={showTraffic ? trafficCells : undefined}
           showJunctions={showJunctions}
         />
       </div>
@@ -212,6 +218,7 @@ export default function Home() {
           {([
             ["Safe", showSafeZones, setShowSafeZones],
             ["Risk Map", showAreaRisk, setShowAreaRisk],
+            ["Traffic", showTraffic, setShowTraffic],
             ["Reports", showReports, setShowReports],
             ["Junctions", showJunctions, setShowJunctions],
           ] as [string, boolean, (v: boolean) => void][]).map(([label, active, setter]) => (
@@ -266,6 +273,13 @@ export default function Home() {
 
         {showDriverScore && <DriverScoreCard score={driverScore} onClose={() => setShowDriverScore(false)} />}
 
+        {showSafeDestinations && (
+          <SafeDestinations
+            position={driverPos ?? (routes.length > 0 ? routes[0].polyline[0] : null)}
+            onClose={() => setShowSafeDestinations(false)}
+          />
+        )}
+
         {showRiskExplainer && riskExplanations.length > 0 && (
           <RiskExplainer explanations={riskExplanations} onClose={() => setShowRiskExplainer(false)} />
         )}
@@ -279,6 +293,13 @@ export default function Home() {
                 className="btn-press w-full py-2.5 rounded-xl text-xs font-semibold glass-panel border-amber-500/15 text-amber-300 hover:text-amber-200 transition-all flex items-center justify-center gap-2">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 View Risk Analysis ({riskExplanations.length} hazards explained)
+              </button>
+            )}
+            {!showSafeDestinations && (
+              <button onClick={() => setShowSafeDestinations(true)}
+                className="btn-press w-full py-2.5 rounded-xl text-xs font-semibold glass-panel border-emerald-500/15 text-emerald-300 hover:text-emerald-200 transition-all flex items-center justify-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+                Find Safe Destinations Nearby
               </button>
             )}
           </>

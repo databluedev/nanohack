@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import L from "leaflet";
-import type { Route, LatLng, EmergencyService, SafeZone, AreaRiskCell, CommunityReport } from "@/lib/types";
+import type { Route, LatLng, EmergencyService, SafeZone, AreaRiskCell, CommunityReport, TrafficCell } from "@/lib/types";
 
 type Props = {
   routes: Route[];
@@ -12,6 +12,7 @@ type Props = {
   safeZones?: SafeZone[];
   areaRiskCells?: AreaRiskCell[];
   communityReports?: CommunityReport[];
+  trafficCells?: TrafficCell[];
   showJunctions?: boolean;
 };
 
@@ -56,7 +57,7 @@ const REPORT_ICON: Record<string, string> = {
 
 export default function MapView({
   routes, driverPos, followDriver, emergencyServices,
-  safeZones, areaRiskCells, communityReports, showJunctions,
+  safeZones, areaRiskCells, communityReports, trafficCells, showJunctions,
 }: Props) {
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -226,6 +227,20 @@ export default function MapView({
       });
     }
 
+    // Traffic congestion cells
+    if (trafficCells) {
+      const cellSize = 0.012;
+      trafficCells.forEach((cell) => {
+        L.rectangle(
+          [[cell.lat - cellSize / 2, cell.lng - cellSize / 2],
+           [cell.lat + cellSize / 2, cell.lng + cellSize / 2]],
+          { color: cell.color, fillColor: cell.color, fillOpacity: 0.2, weight: 0.5 }
+        ).addTo(layer).bindPopup(
+          `<div style="font-family:system-ui;font-size:12px;"><b>Traffic: ${cell.level.replace("_", " ")}</b><br/>Congestion: ${cell.congestion}x<br/>Speed: ${Math.round(cell.speed_factor * 100)}% of free flow${cell.corridor ? `<br/>${cell.corridor}` : ""}</div>`
+        );
+      });
+    }
+
     // Community reports — markers
     if (communityReports) {
       communityReports.forEach((report) => {
@@ -241,7 +256,7 @@ export default function MapView({
         );
       });
     }
-  }, [safeZones, areaRiskCells, communityReports]);
+  }, [safeZones, areaRiskCells, communityReports, trafficCells]);
 
   return <div ref={containerRef} className="absolute inset-0" />;
 }

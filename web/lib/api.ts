@@ -3,6 +3,7 @@ import type {
   EmergencyService, EmergencyAlert, LiveWeather,
   SafeZone, AreaRiskCell, CommunityReport,
   RiskExplanation, TripSession, SmartNotification, Waypoint,
+  TrafficCell, SafeDestination,
 } from "./types";
 
 async function post<T>(path: string, body: unknown): Promise<T> {
@@ -143,6 +144,30 @@ export async function fetchSmartNotification(opts: {
     from_lat: opts.from.lat, from_lng: opts.from.lng,
     to_lat: opts.to.lat, to_lng: opts.to.lng,
     departure: opts.departure, weather: opts.weather,
+  });
+}
+
+// ---- Traffic ----
+export async function fetchTrafficOverlay(opts?: {
+  lat?: number; lng?: number; hour?: number; is_weekend?: boolean; radius_km?: number;
+}): Promise<{ cells: TrafficCell[]; count: number }> {
+  return post("/api/traffic", {
+    lat: opts?.lat ?? 13.05, lng: opts?.lng ?? 80.22,
+    hour: opts?.hour ?? new Date().getHours(),
+    is_weekend: opts?.is_weekend ?? (new Date().getDay() >= 5),
+    radius_km: opts?.radius_km ?? 8.0,
+  });
+}
+
+// ---- Safe Destinations ----
+export async function fetchSafeDestinations(opts: {
+  lat: number; lng: number; category?: string; radius_m?: number; min_safety?: number;
+}): Promise<{ destinations: SafeDestination[]; count: number }> {
+  return post("/api/destinations/safe", {
+    lat: opts.lat, lng: opts.lng,
+    category: opts.category ?? null,
+    radius_m: opts.radius_m ?? 5000,
+    min_safety: opts.min_safety ?? 50,
   });
 }
 
