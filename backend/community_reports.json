@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "lat": 13.05,
+    "lng": 80.22,
+    "type": "pothole",
+    "description": "Deep pothole near bus stop",
+    "severity": 3,
+    "timestamp": "2026-04-15T23:33:04.173730",
+    "upvotes": 0
+  }
+]
