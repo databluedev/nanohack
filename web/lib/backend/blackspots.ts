@@ -1,0 +1,321 @@
+/**
+ * Hand-curated Chennai accident black spots based on public news reports / Chennai Traffic Police bulletins.
+ * Each spot has a base risk weight, location, conditions, risk tags, and junction metadata.
+ */
+
+export interface Blackspot {
+  name: string;
+  lat: number;
+  lng: number;
+  base: number;
+  spikes: Record<string, number>;
+  voice: string;
+  tags: string[];
+  junction_type: string;
+  lanes: number;
+}
+
+export interface SafeZone {
+  name: string;
+  lat: number;
+  lng: number;
+  radius_m: number;
+  reasons: string[];
+}
+
+export const CHENNAI_BLACKSPOTS: Blackspot[] = [
+  {
+    name: "Kathipara Junction (Cloverleaf)",
+    lat: 12.9756, lng: 80.1873,
+    base: 95,
+    spikes: { evening: 1.6, rain: 1.8, night: 1.4 },
+    voice: "Approaching Kathipara cloverleaf. High accident zone \u2014 multiple merging lanes ahead. Slow down.",
+    tags: ["multi-lane merge", "overspeeding", "poor signage"],
+    junction_type: "cloverleaf",
+    lanes: 6,
+  },
+  {
+    name: "Maduravoyal Junction",
+    lat: 13.0668, lng: 80.1727,
+    base: 88,
+    spikes: { morning: 1.4, evening: 1.5, rain: 1.7 },
+    voice: "Maduravoyal junction ahead. Heavy turning traffic, frequent collisions. Reduce speed.",
+    tags: ["heavy turning traffic", "signal violation", "truck traffic"],
+    junction_type: "signal",
+    lanes: 4,
+  },
+  {
+    name: "Koyambedu Roundabout",
+    lat: 13.0697, lng: 80.1959,
+    base: 82,
+    spikes: { evening: 1.5, weekend: 1.3 },
+    voice: "Koyambedu roundabout. Watch for buses cutting across lanes.",
+    tags: ["bus traffic", "lane cutting", "roundabout"],
+    junction_type: "roundabout",
+    lanes: 4,
+  },
+  {
+    name: "Tambaram",
+    lat: 12.9249, lng: 80.1000,
+    base: 78,
+    spikes: { morning: 1.4, evening: 1.5, rain: 1.6 },
+    voice: "Tambaram stretch ahead. Two-wheeler accidents common in this area.",
+    tags: ["two-wheeler zone", "narrow road", "school zone"],
+    junction_type: "corridor",
+    lanes: 2,
+  },
+  {
+    name: "Pallavaram",
+    lat: 12.9675, lng: 80.1491,
+    base: 75,
+    spikes: { evening: 1.5, night: 1.5, rain: 1.6 },
+    voice: "Pallavaram ahead. Poor lighting after dark \u2014 extra caution advised.",
+    tags: ["low lighting", "night risk", "narrow bridge"],
+    junction_type: "flyover",
+    lanes: 3,
+  },
+  {
+    name: "T Nagar (Pondy Bazaar)",
+    lat: 13.0418, lng: 80.2341,
+    base: 72,
+    spikes: { evening: 1.7, weekend: 1.5 },
+    voice: "T Nagar shopping zone. Pedestrian crossings ahead \u2014 slow stretch.",
+    tags: ["pedestrian zone", "commercial area", "jaywalking"],
+    junction_type: "signal",
+    lanes: 4,
+  },
+  {
+    name: "Velachery",
+    lat: 12.9815, lng: 80.2180,
+    base: 70,
+    spikes: { evening: 1.5, rain: 1.8 },
+    voice: "Velachery junction. Known waterlogging spot \u2014 low visibility in rain.",
+    tags: ["waterlogging", "poor drainage", "low visibility"],
+    junction_type: "signal",
+    lanes: 4,
+  },
+  {
+    name: "OMR - Thoraipakkam",
+    lat: 12.9395, lng: 80.2398,
+    base: 80,
+    spikes: { morning: 1.6, evening: 1.7, night: 1.4 },
+    voice: "OMR ahead. IT corridor \u2014 high two-wheeler density during peak hours.",
+    tags: ["overspeeding", "two-wheeler density", "U-turn spot"],
+    junction_type: "u-turn",
+    lanes: 6,
+  },
+  {
+    name: "GST Road - Chromepet",
+    lat: 12.9516, lng: 80.1462,
+    base: 76,
+    spikes: { evening: 1.5, rain: 1.6, night: 1.4 },
+    voice: "GST Road stretch. Heavy truck traffic \u2014 maintain safe distance.",
+    tags: ["truck traffic", "national highway", "overtaking zone"],
+    junction_type: "highway",
+    lanes: 4,
+  },
+  {
+    name: "Anna Salai (Mount Road)",
+    lat: 13.0604, lng: 80.2496,
+    base: 68,
+    spikes: { evening: 1.5, weekend: 1.3 },
+    voice: "Anna Salai. Frequent lane changes near signals \u2014 drive defensively.",
+    tags: ["lane changing", "signal violation", "commercial strip"],
+    junction_type: "arterial",
+    lanes: 6,
+  },
+  {
+    name: "Adyar Signal",
+    lat: 13.0067, lng: 80.2569,
+    base: 65,
+    spikes: { evening: 1.4, rain: 1.5 },
+    voice: "Adyar signal. Pedestrian-heavy junction.",
+    tags: ["pedestrian zone", "school zone", "sharp curve"],
+    junction_type: "signal",
+    lanes: 4,
+  },
+  {
+    name: "Saidapet Bridge",
+    lat: 13.0220, lng: 80.2210,
+    base: 70,
+    spikes: { morning: 1.4, evening: 1.5, rain: 1.7 },
+    voice: "Saidapet bridge. Narrow lanes \u2014 avoid overtaking.",
+    tags: ["narrow bridge", "no overtaking", "waterlogging"],
+    junction_type: "bridge",
+    lanes: 2,
+  },
+  {
+    name: "Vadapalani Signal",
+    lat: 13.0500, lng: 80.2120,
+    base: 67,
+    spikes: { evening: 1.5, weekend: 1.3 },
+    voice: "Vadapalani signal ahead. High two-wheeler accident zone.",
+    tags: ["two-wheeler zone", "signal violation", "temple traffic"],
+    junction_type: "signal",
+    lanes: 4,
+  },
+  {
+    name: "Guindy",
+    lat: 13.0067, lng: 80.2206,
+    base: 73,
+    spikes: { morning: 1.5, evening: 1.6 },
+    voice: "Guindy industrial estate. Watch for sudden lane cuts by trucks.",
+    tags: ["industrial zone", "truck traffic", "lane cutting"],
+    junction_type: "signal",
+    lanes: 4,
+  },
+  {
+    name: "Porur Junction",
+    lat: 13.0381, lng: 80.1565,
+    base: 78,
+    spikes: { morning: 1.5, evening: 1.6, rain: 1.6 },
+    voice: "Porur junction. Multi-direction merge \u2014 slow approach essential.",
+    tags: ["multi-direction merge", "construction zone", "hospital traffic"],
+    junction_type: "roundabout",
+    lanes: 4,
+  },
+  // --- Additional black spots for richer demo coverage ---
+  {
+    name: "Sholinganallur Junction",
+    lat: 12.9010, lng: 80.2279,
+    base: 74,
+    spikes: { morning: 1.5, evening: 1.8, rain: 1.5 },
+    voice: "Sholinganallur junction. OMR signal \u2014 heavy IT traffic during peak hours.",
+    tags: ["IT corridor", "signal violation", "two-wheeler density"],
+    junction_type: "signal",
+    lanes: 6,
+  },
+  {
+    name: "Ambattur Industrial Estate",
+    lat: 13.1143, lng: 80.1548,
+    base: 72,
+    spikes: { morning: 1.6, evening: 1.5, rain: 1.4 },
+    voice: "Ambattur industrial zone. Heavy truck and auto traffic. Stay alert.",
+    tags: ["industrial zone", "truck traffic", "narrow road"],
+    junction_type: "corridor",
+    lanes: 2,
+  },
+  {
+    name: "Perambur Flyover",
+    lat: 13.1120, lng: 80.2350,
+    base: 65,
+    spikes: { evening: 1.4, rain: 1.6, night: 1.3 },
+    voice: "Perambur flyover. Narrow merge at exit. Check blind spots.",
+    tags: ["flyover merge", "narrow lanes", "blind spot"],
+    junction_type: "flyover",
+    lanes: 2,
+  },
+  {
+    name: "Thiruvanmiyur Signal",
+    lat: 12.9830, lng: 80.2640,
+    base: 62,
+    spikes: { evening: 1.5, rain: 1.4 },
+    voice: "Thiruvanmiyur signal. ECR-OMR merge. Watch for auto-rickshaws cutting lanes.",
+    tags: ["auto-rickshaw zone", "lane cutting", "coastal road merge"],
+    junction_type: "signal",
+    lanes: 4,
+  },
+  {
+    name: "Medavakkam - Perumbakkam Road",
+    lat: 12.9200, lng: 80.1920,
+    base: 68,
+    spikes: { morning: 1.4, evening: 1.6, rain: 1.7 },
+    voice: "Medavakkam stretch. Newly developed area \u2014 uneven road surface and poor signage.",
+    tags: ["poor road surface", "poor signage", "construction zone"],
+    junction_type: "corridor",
+    lanes: 2,
+  },
+  {
+    name: "Chromepet Flyover Entry",
+    lat: 12.9520, lng: 80.1430,
+    base: 71,
+    spikes: { morning: 1.5, evening: 1.6, rain: 1.5, night: 1.3 },
+    voice: "Chromepet flyover entry. Sharp incline \u2014 maintain speed. Two-wheelers be extra cautious.",
+    tags: ["flyover entry", "sharp incline", "two-wheeler risk"],
+    junction_type: "flyover",
+    lanes: 3,
+  },
+  {
+    name: "Nungambakkam Railway Crossing",
+    lat: 13.0610, lng: 80.2380,
+    base: 60,
+    spikes: { morning: 1.6, evening: 1.7 },
+    voice: "Nungambakkam area. Congested commercial zone \u2014 pedestrians crossing unpredictably.",
+    tags: ["pedestrian zone", "commercial congestion", "jaywalking"],
+    junction_type: "signal",
+    lanes: 4,
+  },
+  {
+    name: "Mylapore Tank - Kutchery Road",
+    lat: 13.0368, lng: 80.2676,
+    base: 55,
+    spikes: { evening: 1.5, weekend: 1.6 },
+    voice: "Mylapore area. Temple traffic and narrow one-ways. Drive slowly.",
+    tags: ["temple traffic", "narrow one-way", "pedestrian zone"],
+    junction_type: "corridor",
+    lanes: 2,
+  },
+  {
+    name: "Egmore - Pantheon Road",
+    lat: 13.0732, lng: 80.2609,
+    base: 58,
+    spikes: { morning: 1.3, evening: 1.5 },
+    voice: "Egmore station area. Auto-rickshaw stand ahead \u2014 sudden stops common.",
+    tags: ["auto-rickshaw zone", "station traffic", "sudden stops"],
+    junction_type: "signal",
+    lanes: 4,
+  },
+  {
+    name: "Airport Flyover - Pallavaram",
+    lat: 12.9800, lng: 80.1650,
+    base: 77,
+    spikes: { morning: 1.4, evening: 1.5, rain: 1.7, night: 1.5 },
+    voice: "Airport flyover zone. High-speed traffic merging with local roads. Maintain lane discipline.",
+    tags: ["high speed", "flyover merge", "airport traffic"],
+    junction_type: "flyover",
+    lanes: 4,
+  },
+];
+
+export const CHENNAI_SAFE_ZONES: SafeZone[] = [
+  {
+    name: "Marina Beach Road", lat: 13.0500, lng: 80.2824,
+    radius_m: 800, reasons: ["well-lit", "police patrol", "wide road"],
+  },
+  {
+    name: "IIT Madras Campus Area", lat: 12.9916, lng: 80.2336,
+    radius_m: 600, reasons: ["campus zone", "speed limit", "well-maintained"],
+  },
+  {
+    name: "Anna University Zone", lat: 13.0108, lng: 80.2354,
+    radius_m: 500, reasons: ["campus zone", "low traffic", "well-lit"],
+  },
+  {
+    name: "Besant Nagar (Elliot's Beach)", lat: 13.0002, lng: 80.2710,
+    radius_m: 600, reasons: ["residential", "well-lit", "low speed zone"],
+  },
+  {
+    name: "Nungambakkam High Road", lat: 13.0600, lng: 80.2420,
+    radius_m: 500, reasons: ["police station nearby", "commercial area", "CCTV coverage"],
+  },
+  {
+    name: "Boat Club Road", lat: 13.0350, lng: 80.2580,
+    radius_m: 400, reasons: ["residential premium", "wide road", "low traffic"],
+  },
+  {
+    name: "Tidel Park (OMR)", lat: 12.9480, lng: 80.2370,
+    radius_m: 500, reasons: ["IT park", "security patrol", "well-lit"],
+  },
+  {
+    name: "Spencer Plaza Area", lat: 13.0598, lng: 80.2595,
+    radius_m: 300, reasons: ["CCTV coverage", "police presence", "commercial hub"],
+  },
+  {
+    name: "ECR - Injambakkam Stretch", lat: 12.9150, lng: 80.2500,
+    radius_m: 800, reasons: ["wide coastal road", "low traffic", "good visibility"],
+  },
+  {
+    name: "Valluvar Kottam Area", lat: 13.0500, lng: 80.2300,
+    radius_m: 400, reasons: ["residential", "well-maintained", "police patrol"],
+  },
+];
