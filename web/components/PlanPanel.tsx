@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { CHENNAI_PRESETS } from "@/lib/presets";
+import { CHENNAI_PRESETS, DEMO_ROUTES } from "@/lib/presets";
 import { fetchRoutes, fetchWindow, fetchChennaiWeather } from "@/lib/api";
 import { getTripInsight } from "@/lib/tripMemory";
 import type { Route, Weather, WindowResult, LiveWeather, RouteMode } from "@/lib/types";
@@ -97,6 +97,30 @@ export function PlanPanel({ onRoutes, onChooseRoute, routes, chosenIdx, onStart 
       </div>
 
       <div className="px-5 pb-5 space-y-3.5">
+        {/* Quick demo routes */}
+        {routes.length === 0 && (
+          <div>
+            <div className="text-[10px] text-slate-500 font-medium mb-1.5 uppercase tracking-wider">Quick Demo Routes</div>
+            <div className="space-y-1">
+              {DEMO_ROUTES.map((demo, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setFromIdx(demo.from);
+                    setToIdx(demo.to);
+                    setWeather(demo.weather);
+                    setHour(demo.hour);
+                  }}
+                  className="btn-press w-full text-left surface-raised px-3 py-2 hover:bg-slate-800/30 transition"
+                >
+                  <div className="text-xs font-semibold text-slate-300">{demo.name}</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">{demo.highlight}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Live weather */}
         {liveWeather && liveWeather.source !== "fallback" && (
           <div className="surface-raised px-3 py-2.5 flex items-center justify-between">
