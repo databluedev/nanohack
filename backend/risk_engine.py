@@ -96,6 +96,8 @@ def assess_route(
             "score": round(score, 2),
             "voice": spot["voice"],
             "nearest_idx": h["nearest_idx"],
+            "tags": spot.get("tags", []),
+            "junction_type": spot.get("junction_type", "unknown"),
         })
 
     # Background risk per km (structural baseline)

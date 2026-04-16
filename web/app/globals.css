@@ -128,3 +128,196 @@
     @apply font-sans;
   }
 }
+
+/* ========= SafeRoute AI Design System ========= */
+
+/* Glass panel base */
+.glass-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.88) 0%,
+    rgba(15, 23, 42, 0.75) 100%
+  );
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+}
+
+/* Inner card surfaces */
+.surface-raised {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 41, 59, 0.6) 0%,
+    rgba(15, 23, 42, 0.4) 100%
+  );
+  border: 1px solid rgba(100, 116, 139, 0.15);
+  border-radius: 12px;
+}
+
+/* Risk gauge circle */
+.risk-gauge {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+.risk-gauge svg {
+  transform: rotate(-90deg);
+}
+.risk-gauge-track {
+  fill: none;
+  stroke: rgba(51, 65, 85, 0.5);
+  stroke-width: 8;
+}
+.risk-gauge-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    stroke 0.4s ease;
+}
+.risk-gauge-value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SOS button pulse ring */
+@keyframes sos-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+.sos-ring {
+  animation: sos-ring 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Smooth stage transitions */
+.stage-enter {
+  animation: stage-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes stage-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Progress shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.progress-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Route card risk indicator bar */
+.risk-bar {
+  height: 3px;
+  border-radius: 2px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Voice banner entrance */
+@keyframes voice-enter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+.voice-banner {
+  animation: voice-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Danger mode glow */
+@keyframes danger-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.2), 0 0 0 1px rgba(220, 38, 38, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.35), 0 0 0 1px rgba(220, 38, 38, 0.3);
+  }
+}
+.danger-glow {
+  animation: danger-glow 2s ease-in-out infinite;
+}
+
+/* Toggle pill */
+.toggle-pill {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.toggle-pill:hover {
+  transform: translateY(-1px);
+}
+.toggle-pill.active {
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+}
+
+/* Smooth scrollbar for side panel */
+.panel-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.panel-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.3);
+  border-radius: 4px;
+}
+.panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
+}
+
+/* Bar chart hover effect */
+.bar-chart-bar {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.bar-chart-bar:hover {
+  filter: brightness(1.2);
+  transform: scaleY(1.05);
+  transform-origin: bottom;
+}
+
+/* Button press effect */
+.btn-press {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-press:active {
+  transform: scale(0.97);
+}
+
+/* Hazard card proximity glow */
+@keyframes proximity-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+.proximity-near {
+  animation: proximity-pulse 1.2s ease-in-out infinite;
+}

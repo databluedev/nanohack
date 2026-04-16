@@ -1,0 +1,14 @@
+{
+  "name": "saferoute-ai",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --kill-others \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload",
+    "frontend": "cd web && npm run dev",
+    "install:all": "cd web && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

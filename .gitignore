@@ -43,3 +43,9 @@ test-results/
 # Local data / cache
 backend/data/*.parquet
 backend/data/*.cache
+
+# Claude Code
+.claude/
+
+# GSD workflow reference
+get-shit-done-for-antigravity/
